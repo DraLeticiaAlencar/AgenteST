@@ -344,8 +344,8 @@
                 <h2 class="card-titulo">Painel de Envio</h2>
                 
                 <div class="form-grupo">
-                    <label for="youtube">1. Cole o Link do YouTube</label>
-                    <input type="url" id="youtube" placeholder="https://www.youtube.com/watch?v=..." oninput="analisarLinkYoutube()" required>
+                    <label for="youtube">1. Cole o Link do YouTube ou YouTube Shorts</label>
+                    <input type="url" id="youtube" placeholder="https://www.youtube.com/shorts/... ou youtube.com/watch?v=..." oninput="analisarLinkYoutube()" required>
                 </div>
 
                 <!-- Preview Carregado Automaticamente -->
@@ -454,7 +454,6 @@
     <div class="toast" id="toast">Copiado!</div>
 
     <script>
-        // Estrutura de roteirização direcionada a dinâmicas de finanças
         const estruturasFinanceiras = {
             "Ilusão do Sistema Financeiro": {
                 aberturas: [
@@ -523,27 +522,37 @@
 
         renderHistorico();
 
-        // Faz o fetch real de informações do YouTube
         async function analisarLinkYoutube() {
-            const url = document.getElementById('youtube').value.trim();
+            let urlOriginal = document.getElementById('youtube').value.trim();
             const container = document.getElementById('preview-container');
             const thumb = document.getElementById('preview-thumb');
             const title = document.getElementById('preview-title');
             const channel = document.getElementById('preview-channel');
 
-            if (!url.includes("youtube.com") && !url.includes("youtu.be")) {
+            if (!urlOriginal) {
+                container.style.display = 'none';
+                return;
+            }
+
+            // CORREÇÃO: Converter link do Shorts para link de vídeo normal para que o Noembed consiga ler
+            let urlConvertida = urlOriginal;
+            if (urlOriginal.includes("/shorts/")) {
+                urlConvertida = urlOriginal.replace("/shorts/", "/watch?v=");
+            }
+
+            if (!urlConvertida.includes("youtube.com") && !urlConvertida.includes("youtu.be")) {
                 container.style.display = 'none';
                 return;
             }
 
             container.style.display = 'flex';
-            title.innerText = "Buscando metadados do vídeo...";
+            title.innerText = "Localizando dados do Shorts...";
             channel.innerText = "";
             thumb.style.backgroundImage = "none";
 
             try {
-                // Utiliza a API open-source noembed para obter metadados sem necessidade de chave
-                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+                // Requisição para a API externa usando o link convertido para o formato padrão do YouTube
+                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(urlConvertida)}`);
                 const data = await response.json();
 
                 if (data.title) {
@@ -551,21 +560,21 @@
                         titulo: data.title,
                         autor: data.author_name,
                         thumbnail: data.thumbnail_url,
-                        link: url
+                        link: urlOriginal // Mantém o link Shorts original que o usuário enviou
                     };
 
                     title.innerText = data.title;
                     channel.innerText = data.author_name;
                     thumb.style.backgroundImage = `url('${data.thumbnail_url}')`;
                 } else {
-                    title.innerText = "Vídeo localizado, insira os dados abaixo.";
-                    channel.innerText = "Não foi possível puxar os dados do canal.";
-                    videoDadosAtuais = { titulo: "Corte do YouTube", autor: "Canal Externo", link: url };
+                    title.innerText = "Vídeo identificado.";
+                    channel.innerText = "Não foi possível resgatar o canal.";
+                    videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: urlOriginal };
                 }
             } catch (error) {
-                title.innerText = "Corte do YouTube";
-                channel.innerText = "Metadados indisponíveis, mas o link foi capturado.";
-                videoDadosAtuais = { titulo: "Corte do YouTube", autor: "Canal Externo", link: url };
+                title.innerText = "Corte do YouTube Shorts";
+                channel.innerText = "Dados indisponíveis, mas o link foi mapeado.";
+                videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: urlOriginal };
             }
         }
 
@@ -576,33 +585,30 @@
             const oferta = document.getElementById('oferta').value.trim();
 
             if (!youtubeUrl || !oferta) {
-                alert("Por favor, preencha o link do YouTube e defina a sua Oferta na Bio.");
+                alert("Por favor, cole o link do YouTube Shorts e preencha a sua Oferta na Bio.");
                 return;
             }
 
             if (!videoDadosAtuais) {
-                videoDadosAtuais = { titulo: "Corte do YouTube", autor: "Canal Externo", link: youtubeUrl };
+                videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: youtubeUrl };
             }
 
-            // Selecionar o padrão correspondente
             const padrao = estruturasFinanceiras[tema];
             const randIdx = Math.floor(Math.random() * padrao.aberturas.length);
 
             let abertura = `"${padrao.aberturas[randIdx]}"`;
             let fechamento = `"${padrao.fechamentos[randIdx]}"`;
 
-            // Construção da legenda combinando as falas e o título real do vídeo
-            let legenda = `O vídeo "${videoDadosAtuais.titulo}" ilustra com perfeição as dinâmicas de poder de quem realmente manipula o fluxo do capital no mercado.\n\nFocar em apenas economizar te deixa vulnerável ao sistema. Se você quer de fato começar a criar riqueza real e sair da defensiva, desenvolvemos um manual definitivo.\n\n🔗 Clique no link da bio e acesse: ${oferta}.`;
+            let legenda = `O vídeo "${videoDadosAtuais.titulo}" ilustra com clareza as dinâmicas de quem entende o fluxo do capital e como o sistema recompensa os donos do jogo.\n\nSe você deseja sair da defensiva e construir riqueza real, preparamos uma solução passo a passo.\n\n🔗 Clique no link da bio e acesse: ${oferta}.`;
 
             if (notas) {
-                legenda = `Como extraído deste trecho: "${notas}"\n\nEssa dinâmica vista em "${videoDadosAtuais.titulo}" é o reflexo de quem opera o sistema sabendo das regras ocultas, enquanto a massa joga sem informações básicas.\n\nPara blindar seu patrimônio e estruturar uma jornada de ativos, clique no link da nossa bio e acesse o: ${oferta}.`;
+                legenda = `Como extraído deste trecho: "${notas}"\n\nEssa dinâmica vista em "${videoDadosAtuais.titulo}" é o reflexo direto de quem estuda as regras do dinheiro, enquanto a maioria continua jogando de olhos fechados.\n\nPara quebrar esse ciclo e começar a estruturar ativos reais, clique no link da nossa bio e confira o: ${oferta}.`;
             }
 
             const hashtags = `#dinheiro #independenciafinanceira #mentalidademilionaria #perfildark #negocios #financas #${tema.toLowerCase().replace(/[^a-z]/g, "")}`;
-            const ganchoExtra = "👉 Salve esse post para manter sua mente alinhada ao jogo correto.";
+            const ganchoExtra = "👉 Salve esse post para manter sua mente focada nas regras do jogo.";
 
-            // Exibir na UI
-            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo Analisado:</strong> ${videoDadosAtuais.titulo}<br>👤 <strong>Canal/Autor:</strong> ${videoDadosAtuais.autor}<br>🎯 <strong>Abordagem:</strong> ${tema}`;
+            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo:</strong> ${videoDadosAtuais.titulo}<br>👤 <strong>Canal/Autor:</strong> ${videoDadosAtuais.autor}<br>🎯 <strong>Abordagem:</strong> ${tema}`;
             document.getElementById('out-abertura').innerText = abertura;
             document.getElementById('out-fechamento').innerText = fechamento;
             document.getElementById('out-legenda').innerText = legenda;
@@ -611,7 +617,6 @@
             document.getElementById('output-vazio').style.display = 'none';
             document.getElementById('output-conteudo').style.display = 'flex';
 
-            // Salvar no Histórico local
             const novoRoteiro = {
                 id: Date.now(),
                 titulo: videoDadosAtuais.titulo,
@@ -638,7 +643,7 @@
                 tr.innerHTML = `
                     <td><strong>${item.titulo}</strong></td>
                     <td>${item.tema}</td>
-                    <td><a href="${item.link}" target="_blank" class="btn-acao" style="border-color: #3b82f6; color: #60a5fa;">Baixar Original ↗</a></td>
+                    <td><a href="${item.link}" target="_blank" class="btn-acao" style="border-color: #3b82f6; color: #60a5fa;">Ver Shorts Original ↗</a></td>
                     <td>
                         <button class="btn-acao" onclick="excluirItem(${item.id})">Excluir</button>
                     </td>
@@ -654,8 +659,8 @@
         }
 
         function copiarTexto(idElemento) {
-            const texto = document.getElementById(idElemento).innerText;
-            navigator.clipboard.writeText(texto);
+            const text = document.getElementById(idElemento).innerText;
+            navigator.clipboard.writeText(text);
             mostrarToast("Copiado!");
         }
 
