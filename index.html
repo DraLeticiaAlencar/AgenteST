@@ -182,18 +182,15 @@
         .preview-info {
             display: flex;
             flex-direction: column;
-            gap: 0.2rem;
+            gap: 0.3rem;
+            flex-grow: 1;
         }
 
-        .preview-titulo {
-            font-size: 0.85rem;
-            font-weight: 650;
-            color: #fff;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .preview-info input {
+            padding: 0.4rem;
+            font-size: 0.8rem;
+            background: #121216;
+            border: 1px solid #3a3a4a;
         }
 
         .preview-autor {
@@ -348,11 +345,12 @@
                     <input type="url" id="youtube" placeholder="https://www.youtube.com/shorts/... ou youtube.com/watch?v=..." oninput="analisarLinkYoutube()" required>
                 </div>
 
-                <!-- Preview Carregado Automaticamente -->
+                <!-- Preview Carregado Automaticamente com Inputs de Segurança -->
                 <div class="preview-video" id="preview-container" style="display: none;">
                     <div class="preview-thumbnail" id="preview-thumb"></div>
                     <div class="preview-info">
-                        <span class="preview-titulo" id="preview-title">Carregando...</span>
+                        <label style="font-size: 0.7rem;">Título do Vídeo (Ajuste se necessário):</label>
+                        <input type="text" id="preview-title-input" placeholder="Digite o título do corte">
                         <span class="preview-autor" id="preview-channel">Canal</span>
                     </div>
                 </div>
@@ -522,60 +520,73 @@
 
         renderHistorico();
 
+        // Extrai o ID de qualquer tipo de link do YouTube usando Regex (seguro contra CORS)
+        function obterYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         async function analisarLinkYoutube() {
-            let urlOriginal = document.getElementById('youtube').value.trim();
+            const urlOriginal = document.getElementById('youtube').value.trim();
             const container = document.getElementById('preview-container');
             const thumb = document.getElementById('preview-thumb');
-            const title = document.getElementById('preview-title');
+            const titleInput = document.getElementById('preview-title-input');
             const channel = document.getElementById('preview-channel');
 
-            if (!urlOriginal) {
+            const videoId = obterYoutubeId(urlOriginal);
+
+            if (!videoId) {
                 container.style.display = 'none';
+                videoDadosAtuais = null;
                 return;
             }
 
-            // CORREÇÃO: Converter link do Shorts para link de vídeo normal para que o Noembed consiga ler
-            let urlConvertida = urlOriginal;
-            if (urlOriginal.includes("/shorts/")) {
-                urlConvertida = urlOriginal.replace("/shorts/", "/watch?v=");
-            }
-
-            if (!urlConvertida.includes("youtube.com") && !urlConvertida.includes("youtu.be")) {
-                container.style.display = 'none';
-                return;
-            }
-
+            // Exibe o contêiner imediatamente e carrega a imagem de capa (isento de erro de CORS)
             container.style.display = 'flex';
-            title.innerText = "Localizando dados do Shorts...";
-            channel.innerText = "";
-            thumb.style.backgroundImage = "none";
+            thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg')`;
+            channel.innerText = "Buscando informações básicas...";
+            titleInput.value = "Aguardando título ou digite aqui...";
 
+            // Configura os metadados padrões caso a API de metadados seja bloqueada pelo navegador (CORS)
+            videoDadosAtuais = {
+                titulo: "Corte do YouTube",
+                autor: "Canal do YouTube",
+                thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+                link: urlOriginal
+            };
+
+            // Tenta obter os metadados dinamicamente via noembed de forma segura
             try {
-                // Requisição para a API externa usando o link convertido para o formato padrão do YouTube
-                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(urlConvertida)}`);
-                const data = await response.json();
-
-                if (data.title) {
-                    videoDadosAtuais = {
-                        titulo: data.title,
-                        autor: data.author_name,
-                        thumbnail: data.thumbnail_url,
-                        link: urlOriginal // Mantém o link Shorts original que o usuário enviou
-                    };
-
-                    title.innerText = data.title;
-                    channel.innerText = data.author_name;
-                    thumb.style.backgroundImage = `url('${data.thumbnail_url}')`;
+                const cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(cleanUrl)}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.title) {
+                        videoDadosAtuais.titulo = data.title;
+                        videoDadosAtuais.autor = data.author_name;
+                        titleInput.value = data.title;
+                        channel.innerText = data.author_name;
+                    } else {
+                        fallbackDados(videoId);
+                    }
                 } else {
-                    title.innerText = "Vídeo identificado.";
-                    channel.innerText = "Não foi possível resgatar o canal.";
-                    videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: urlOriginal };
+                    fallbackDados(videoId);
                 }
             } catch (error) {
-                title.innerText = "Corte do YouTube Shorts";
-                channel.innerText = "Dados indisponíveis, mas o link foi mapeado.";
-                videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: urlOriginal };
+                fallbackDados(videoId);
             }
+        }
+
+        function fallbackDados(videoId) {
+            const titleInput = document.getElementById('preview-title-input');
+            const channel = document.getElementById('preview-channel');
+            
+            titleInput.value = "Corte do Shorts (Ajuste o Título aqui)";
+            channel.innerText = "Modo manual ativado (CORS restringido)";
+            videoDadosAtuais.titulo = "Corte do Shorts";
+            videoDadosAtuais.autor = "Canal do YouTube";
         }
 
         function processarERoteirizar() {
@@ -583,14 +594,28 @@
             const tema = document.getElementById('tema').value;
             const notas = document.getElementById('dialogo').value.trim();
             const oferta = document.getElementById('oferta').value.trim();
+            const inputTituloCustomizado = document.getElementById('preview-title-input').value.trim();
 
             if (!youtubeUrl || !oferta) {
                 alert("Por favor, cole o link do YouTube Shorts e preencha a sua Oferta na Bio.");
                 return;
             }
 
-            if (!videoDadosAtuais) {
-                videoDadosAtuais = { titulo: "Corte do YouTube Shorts", autor: "Canal", link: youtubeUrl };
+            const videoId = obterYoutubeId(youtubeUrl);
+            if (!videoId) {
+                alert("O link do YouTube informado não parece válido.");
+                return;
+            }
+
+            // Atualiza os dados de acordo com o que está escrito no campo editável
+            if (videoDadosAtuais) {
+                videoDadosAtuais.titulo = inputTituloCustomizado || videoDadosAtuais.titulo;
+            } else {
+                videoDadosAtuais = {
+                    titulo: inputTituloCustomizado || "Corte do Shorts",
+                    autor: "Canal",
+                    link: youtubeUrl
+                };
             }
 
             const padrao = estruturasFinanceiras[tema];
@@ -608,7 +633,7 @@
             const hashtags = `#dinheiro #independenciafinanceira #mentalidademilionaria #perfildark #negocios #financas #${tema.toLowerCase().replace(/[^a-z]/g, "")}`;
             const ganchoExtra = "👉 Salve esse post para manter sua mente focada nas regras do jogo.";
 
-            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo:</strong> ${videoDadosAtuais.titulo}<br>👤 <strong>Canal/Autor:</strong> ${videoDadosAtuais.autor}<br>🎯 <strong>Abordagem:</strong> ${tema}`;
+            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo:</strong> ${videoDadosAtuais.titulo}<br>🎯 <strong>Abordagem:</strong> ${tema}`;
             document.getElementById('out-abertura').innerText = abertura;
             document.getElementById('out-fechamento').innerText = fechamento;
             document.getElementById('out-legenda').innerText = legenda;
