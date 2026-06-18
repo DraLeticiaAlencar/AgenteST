@@ -16,6 +16,7 @@
             --cor-destaque: #d4af37; /* Dourado */
             --cor-destaque-hover: #f3cd57;
             --cor-sucesso: #10b981;
+            --cor-alerta: #f59e0b;
         }
 
         * {
@@ -158,6 +159,27 @@
             transform: translateY(-2px);
         }
 
+        /* Configurações de API */
+        .config-box {
+            background: #15151e;
+            border: 1px dashed var(--cor-borda);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .config-toggle {
+            font-size: 0.75rem;
+            color: var(--cor-destaque);
+            cursor: pointer;
+            text-decoration: underline;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
         /* Preview do Vídeo do Youtube */
         .preview-video {
             display: flex;
@@ -193,9 +215,10 @@
             border: 1px solid #3a3a4a;
         }
 
-        .preview-autor {
+        .preview-status {
             font-size: 0.75rem;
-            color: var(--cor-subtexto);
+            color: var(--cor-alerta);
+            font-weight: 600;
         }
 
         /* Output do Roteiro */
@@ -278,20 +301,6 @@
             border-bottom: none;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 650;
-        }
-
-        .status-pronto {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--cor-sucesso);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
         .btn-acao {
             background: transparent;
             border: 1px solid var(--cor-borda);
@@ -331,8 +340,22 @@
         
         <header>
             <h1>CURADOR <span>DARK</span></h1>
-            <p>Storytelling Financeiro de Alta Conversão</p>
+            <p>Fórmula Inteligente Setup + Punchline ( : )</p>
         </header>
+
+        <!-- CONFIGURAÇÕES DE API DE INTELIGÊNCIA ARTIFICIAL -->
+        <section class="card config-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: bold; color: #fff;">🔑 Ativar Inteligência de Transcrição Avançada?</span>
+                <span class="config-toggle" onclick="toggleConfig()">[Abrir Configuração]</span>
+            </div>
+            <div id="api-config-fields" style="display: none; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                <p style="font-size: 0.75rem; color: var(--cor-subtexto); line-height: 1.4;">
+                    Para o sistema ler a transcrição real do Shorts, insira uma chave API do Gemini (Grátis no <a href="https://aistudio.google.com/" target="_blank" style="color: var(--cor-destaque);">Google AI Studio</a>). Se não preencher, o site gerará os ganchos por algoritmo inteligente local.
+                </p>
+                <input type="password" id="gemini-key" placeholder="Cole sua API Key do Gemini aqui..." onchange="salvarChave()">
+            </div>
+        </section>
 
         <div class="painel-grid">
             
@@ -341,42 +364,39 @@
                 <h2 class="card-titulo">Painel de Envio</h2>
                 
                 <div class="form-grupo">
-                    <label for="youtube">1. Cole o Link do YouTube ou YouTube Shorts</label>
-                    <input type="url" id="youtube" placeholder="https://www.youtube.com/shorts/... ou youtube.com/watch?v=..." oninput="analisarLinkYoutube()" required>
+                    <label for="youtube">1. Link do YouTube Shorts / Vídeo</label>
+                    <input type="url" id="youtube" placeholder="https://www.youtube.com/shorts/..." oninput="analisarLinkYoutube()" required>
                 </div>
 
-                <!-- Preview Carregado Automaticamente com Inputs de Segurança -->
+                <!-- Preview do Vídeo com Status da Transcrição -->
                 <div class="preview-video" id="preview-container" style="display: none;">
                     <div class="preview-thumbnail" id="preview-thumb"></div>
                     <div class="preview-info">
-                        <label style="font-size: 0.7rem;">Título do Vídeo (Ajuste se necessário):</label>
-                        <input type="text" id="preview-title-input" placeholder="Digite o título do corte">
-                        <span class="preview-autor" id="preview-channel">Canal</span>
+                        <label style="font-size: 0.7rem;">Título Base do Vídeo:</label>
+                        <input type="text" id="preview-title-input" placeholder="Processando...">
+                        <span class="preview-status" id="preview-status">Aguardando transcrição...</span>
                     </div>
                 </div>
 
                 <div class="form-grupo">
-                    <label for="tema">2. Abordagem sobre Dinheiro</label>
+                    <label for="tema">2. Abordagem Financeira Principal (Fórmula :)</label>
                     <select id="tema">
-                        <option value="Ilusão do Sistema Financeiro">Ilusão do Sistema Financeiro</option>
-                        <option value="Investimentos & Geração de Ativos">Investimentos & Geração de Ativos</option>
-                        <option value="Quebrando a Mente de Escassez">Quebrando a Mente de Escassez</option>
-                        <option value="Saindo da Corrida dos Ratos">Saindo da Corrida dos Ratos</option>
-                        <option value="A Frieza do Jogo do Dinheiro">A Frieza do Jogo do Dinheiro</option>
+                        <option value="Disfarce/aparência x riqueza real">Disfarce/aparência x riqueza real</option>
+                        <option value="Retorno surpresa / sumiço misterioso">Retorno surpresa / sumiço misterioso</option>
+                        <option value="Dinheiro x relacionamento/romance">Dinheiro x relacionamento/romance</option>
+                        <option value="Dinheiro x poder/respeito">Dinheiro x poder/respeito</option>
+                        <option value="Lealdade vs dinheiro">Lealdade vs dinheiro</option>
+                        <option value="Confissão em 1ª pessoa/cotidiano">Confissão em 1ª pessoa/cotidiano</option>
+                        <option value="Contraste/ironia">Contraste/ironia</option>
                     </select>
                 </div>
 
                 <div class="form-grupo">
-                    <label for="dialogo">3. Transcrição / Notas da Cena (Opcional)</label>
-                    <textarea id="dialogo" placeholder="Cole trechos do que é falado ou ideias chave para que o sistema capture os termos exatos do vídeo..."></textarea>
+                    <label for="oferta">3. Oferta Atual na Bio (Seu Produto)</label>
+                    <input type="text" id="oferta" placeholder="Ex: Método Liberdade, Manual de Ativos..." required>
                 </div>
 
-                <div class="form-grupo">
-                    <label for="oferta">4. Oferta na Bio (Seu Produto/Serviço)</label>
-                    <input type="text" id="oferta" placeholder="Ex: Manual da Riqueza, Mentoria Liberdade..." required>
-                </div>
-
-                <button class="btn-principal" onclick="processarERoteirizar()">Gerar Roteiro Baseado no Vídeo</button>
+                <button class="btn-principal" id="btn-gerar" onclick="processarERoteirizar()">Gerar Roteiro (Fórmula :)</button>
             </section>
 
             <!-- RESULTADO DO ROTEIRO -->
@@ -387,24 +407,24 @@
                 </h2>
                 
                 <div class="output-roteiro" id="output-vazio" style="text-align: center; padding: 4rem 0; color: var(--cor-subtexto);">
-                    <p>Ao colar o link, o sistema puxará o vídeo do YouTube. Insira sua oferta na bio e gere o roteiro estruturado.</p>
+                    <p>Cole o link do vídeo para baixar e obter a transcrição em tempo real.</p>
                 </div>
 
                 <div class="output-roteiro" id="output-conteudo" style="display: none;">
                     
                     <div class="bloco-roteiro">
-                        <h4>🎬 Referência do YouTube</h4>
+                        <h4>🎬 Referência & Análise</h4>
                         <p id="out-fonte"></p>
                     </div>
 
                     <div class="bloco-roteiro">
-                        <h4>🎯 Abertura (Gancho Viral - 2-3s)</h4>
-                        <p id="out-abertura"></p>
+                        <h4>🎯 Abertura (Gancho Setup - termina em ":")</h4>
+                        <p id="out-abertura" style="font-weight: 700; color: #fff;"></p>
                         <button class="btn-copiar" onclick="copiarTexto('out-abertura')">Copiar</button>
                     </div>
 
                     <div class="bloco-roteiro">
-                        <h4>🎯 Fechamento (Reflexão / Compartilhar - 3-4s)</h4>
+                        <h4>🎯 Fechamento (Reflexão - 3-4s)</h4>
                         <p id="out-fechamento"></p>
                         <button class="btn-copiar" onclick="copiarTexto('out-fechamento')">Copiar</button>
                     </div>
@@ -416,7 +436,7 @@
                     </div>
 
                     <div class="bloco-roteiro">
-                        <h4>🏷️ Hashtags & Sugestões</h4>
+                        <h4>🏷️ Hashtags</h4>
                         <p id="out-tags"></p>
                         <button class="btn-copiar" onclick="copiarTexto('out-tags')">Copiar</button>
                     </div>
@@ -452,75 +472,58 @@
     <div class="toast" id="toast">Copiado!</div>
 
     <script>
-        const estruturasFinanceiras = {
-            "Ilusão do Sistema Financeiro": {
-                aberturas: [
-                    "O sistema quer que você passe a vida trocando suas melhores horas por papel pintado.",
-                    "Eles imprimem trilhões em computadores, enquanto ensinam você a economizar centavos.",
-                    "Se você entender como o sistema de dívidas funciona, nunca mais dormirá tranquilo."
-                ],
-                fechamentos: [
-                    "As regras foram feitas para beneficiar quem as criou, não quem trabalha nelas.",
-                    "O dinheiro não é real, mas o controle que ele exerce sobre a sua liberdade é.",
-                    "Não seja um escravo voluntário de uma economia projetada para te manter dependente."
-                ]
+        // Banco de Dados de fallback local (caso o usuário não possua API Key ativa)
+        const estruturasFallback = {
+            "Disfarce/aparência x riqueza real": {
+                aberturas: ["Aquele cara que se veste como o estagiário, mas na verdade é o dono da empresa:", "Quando o cara mais silencioso da mesa é o que tem mais dígitos na conta bancária:"],
+                fechamentos: ["Quem tem riqueza de verdade foca em ter controle, não em parecer importante."]
             },
-            "Investimentos & Geração de Ativos": {
-                aberturas: [
-                    "Pessoas comuns compram luxos primeiro. Mentes ricas adquirem ativos que pagam esses luxos.",
-                    "A inflação destrói quem guarda dinheiro debaixo do colchão e enriquece quem detém ativos.",
-                    "Enquanto você trabalha pelo dinheiro, os juros compostos trabalham no silêncio."
-                ],
-                fechamentos: [
-                    "A sua riqueza não depende do quanto você ganha, mas do quanto você faz trabalhar por você.",
-                    "Pare de ostentar bens depreciáveis e comece a acumular valor real.",
-                    "Compre o tempo das pessoas, não permita que comprem o seu para sempre."
-                ]
+            "Retorno surpresa / sumiço misterioso": {
+                aberturas: ["O real motivo do meu sumiço nos últimos anos e a razão de ninguém mais me encontrar:", "Aquele amigo que sumiu por 2 anos e do nada voltou agindo assim:"],
+                fechamentos: ["Construir no silêncio custa caro, mas o retorno apaga qualquer dúvida."]
             },
-            "Quebrando a Mente de Escassez": {
-                aberturas: [
-                    "Te ensinaram que o dinheiro é sujo para que você não sinta falta dele.",
-                    "O custo da segurança e do conforto é a renúncia ao topo financeiro.",
-                    "Economizar o cafezinho não vai te deixar milionário. Foque em criar novas fontes de receita."
-                ],
-                fechamentos: [
-                    "A escassez é uma prisão mental que dita as decisões que limitam seu bolso.",
-                    "O dinheiro não corrompe ninguém, apenas escancara os valores de quem o possui.",
-                    "Sua conta bancária atual é o reflexo exato da sua tolerância com o comum."
-                ]
+            "Dinheiro x relacionamento/romance": {
+                aberturas: ["Eu fugindo de qualquer drama amoroso porque o meu foco financeiro ainda não foi pago:", "Quando ela diz que o dinheiro não me mudaria, mas me vê agindo assim:"],
+                fechamentos: ["A pessoa certa vai entender a sua fase de construção, não cobrar uma colheita precoce."]
             },
-            "Saindo da Corrida dos Ratos": {
-                aberturas: [
-                    "Sua rotina das 8h às 18h foi perfeitamente arquitetada para te manter focado em sobreviver.",
-                    "Vender o seu tempo é o modelo de negócios mais arriscado que você poderia aceitar.",
-                    "Se a sua única fonte de renda sumir amanhã, quantos dias você consegue manter o seu padrão?"
-                ],
-                fechamentos: [
-                    "Trabalhar duro para construir o império de outra pessoa é uma escolha cara.",
-                    "A liberdade não reside no saldo bancário, mas no poder de dizer não a quem te paga.",
-                    "Saia do labirinto antes que a idade te force a aceitar as migalhas dele."
-                ]
+            "Dinheiro x poder/respeito": {
+                aberturas: ["Quando o saldo na conta finalmente começa a falar muito mais alto que a sua voz:", "Como eles te tratavam quando você não tinha nada, comparado ao dia em que você chegou assim:"],
+                fechamentos: ["O mundo não respeita intenções, ele respeita a competência e a força de quem age."]
             },
-            "A Frieza do Jogo do Dinheiro": {
-                aberturas: [
-                    "No topo da pirâmide dos negócios, decisões são tomadas com frieza milimétrica.",
-                    "O mercado não tem pena de quem chora; ele recompensa quem antecipa os movimentos.",
-                    "Quem age por emoção nas finanças acaba virando liquidez para quem age com estratégia."
-                ],
-                fechamentos: [
-                    "Afaste as desculpas emocionais se você planeja vencer a concorrência.",
-                    "Estude o jogo de quem já chegou lá e pare de ouvir conselhos de quem nunca construiu nada.",
-                    "O tabuleiro do capital joga duro. Aprenda a atacar em vez de apenas se defender."
-                ]
+            "Lealdade vs dinheiro": {
+                aberturas: ["Quando o dinheiro fácil tenta testar o caráter e a lealdade de quem esteve comigo desde o começo:", "Como eu reajo quando percebo que a amizade deles tinha uma etiqueta de preço:"],
+                fechamentos: ["O dinheiro pode comprar alianças temporárias, mas a lealdade real não tem preço."]
+            },
+            "Confissão em 1ª pessoa/cotidiano": {
+                aberturas: ["Como eu me sinto quando ela pergunta de onde vem o pix que cai na conta o dia inteiro:", "Quando me chamam para gastar o que ainda não tenho, mas eu sei exatamente o que está rendendo:"],
+                fechamentos: ["A sensação de ver seus projetos darem retorno financeiro supera qualquer validação externa."]
+            },
+            "Contraste/ironia": {
+                aberturas: ["Quando me falam que o dinheiro não resolve tudo e eu lembro dessa cena aqui:", "Eu fingindo concordar que a felicidade não se compra enquanto estou nessa cena:"],
+                fechamentos: ["Dinheiro pode não comprar felicidade, mas a escassez absoluta não protege ninguém."]
             }
         };
 
         let videoDadosAtuais = null;
+        let transcricaoAtualText = "";
         let historico = JSON.parse(localStorage.getItem('historico_dark_youtube')) || [];
+
+        // Carregar chave salva se houver
+        document.getElementById('gemini-key').value = localStorage.getItem('gemini_api_key') || "";
 
         renderHistorico();
 
-        // Extrai o ID de qualquer tipo de link do YouTube usando Regex (seguro contra CORS)
+        function toggleConfig() {
+            const fields = document.getElementById('api-config-fields');
+            fields.style.display = fields.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function salvarChave() {
+            const key = document.getElementById('gemini-key').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            mostrarToast("Chave API salva localmente!");
+        }
+
         function obterYoutubeId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -532,7 +535,7 @@
             const container = document.getElementById('preview-container');
             const thumb = document.getElementById('preview-thumb');
             const titleInput = document.getElementById('preview-title-input');
-            const channel = document.getElementById('preview-channel');
+            const statusLabel = document.getElementById('preview-status');
 
             const videoId = obterYoutubeId(urlOriginal);
 
@@ -542,13 +545,12 @@
                 return;
             }
 
-            // Exibe o contêiner imediatamente e carrega a imagem de capa (isento de erro de CORS)
             container.style.display = 'flex';
             thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg')`;
-            channel.innerText = "Buscando informações básicas...";
-            titleInput.value = "Aguardando título ou digite aqui...";
+            titleInput.value = "Identificando título...";
+            statusLabel.innerText = "⏳ Extraindo transcrição do Shorts...";
+            statusLabel.style.color = "var(--cor-alerta)";
 
-            // Configura os metadados padrões caso a API de metadados seja bloqueada pelo navegador (CORS)
             videoDadosAtuais = {
                 titulo: "Corte do YouTube",
                 autor: "Canal do YouTube",
@@ -556,102 +558,149 @@
                 link: urlOriginal
             };
 
-            // Tenta obter os metadados dinamicamente via noembed de forma segura
+            // 1. Buscar Metadados Básicos do Vídeo
             try {
-                const cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
-                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(cleanUrl)}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.title) {
-                        videoDadosAtuais.titulo = data.title;
-                        videoDadosAtuais.autor = data.author_name;
-                        titleInput.value = data.title;
-                        channel.innerText = data.author_name;
-                    } else {
-                        fallbackDados(videoId);
-                    }
-                } else {
-                    fallbackDados(videoId);
+                const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}`);
+                const data = await response.json();
+                if (data.title) {
+                    videoDadosAtuais.titulo = data.title;
+                    videoDadosAtuais.autor = data.author_name;
+                    titleInput.value = data.title;
                 }
             } catch (error) {
-                fallbackDados(videoId);
+                titleInput.value = "Corte do Shorts";
+            }
+
+            // 2. TENTATIVA REAL DE CAPTURAR A TRANSCRIÇÃO (API open-source sem key)
+            try {
+                // Utilizando a API pública recomendada para ler legendas de vídeos
+                const respTrans = await fetch(`https://youtube-transcript.ai/transcript/${videoId}.txt`);
+                if (respTrans.ok) {
+                    const textoTranscrito = await respTrans.text();
+                    transcricaoAtualText = textoTranscrito;
+                    statusLabel.innerText = "✓ Transcrição lida com sucesso!";
+                    statusLabel.style.color = "var(--cor-sucesso)";
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                transcricaoAtualText = "";
+                statusLabel.innerText = "⚠️ Transcrição indisponível (Usando gerador padrão)";
+                statusLabel.style.color = "var(--cor-subtexto)";
             }
         }
 
-        function fallbackDados(videoId) {
-            const titleInput = document.getElementById('preview-title-input');
-            const channel = document.getElementById('preview-channel');
-            
-            titleInput.value = "Corte do Shorts (Ajuste o Título aqui)";
-            channel.innerText = "Modo manual ativado (CORS restringido)";
-            videoDadosAtuais.titulo = "Corte do Shorts";
-            videoDadosAtuais.autor = "Canal do YouTube";
-        }
-
-        function processarERoteirizar() {
+        async function processarERoteirizar() {
             const youtubeUrl = document.getElementById('youtube').value.trim();
             const tema = document.getElementById('tema').value;
-            const notas = document.getElementById('dialogo').value.trim();
             const oferta = document.getElementById('oferta').value.trim();
-            const inputTituloCustomizado = document.getElementById('preview-title-input').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key');
+            const inputTitulo = document.getElementById('preview-title-input').value.trim();
+            const btn = document.getElementById('btn-gerar');
 
             if (!youtubeUrl || !oferta) {
-                alert("Por favor, cole o link do YouTube Shorts e preencha a sua Oferta na Bio.");
+                alert("Por favor, preencha o link do YouTube e sua Oferta da Bio.");
                 return;
             }
 
-            const videoId = obterYoutubeId(youtubeUrl);
-            if (!videoId) {
-                alert("O link do YouTube informado não parece válido.");
-                return;
-            }
-
-            // Atualiza os dados de acordo com o que está escrito no campo editável
             if (videoDadosAtuais) {
-                videoDadosAtuais.titulo = inputTituloCustomizado || videoDadosAtuais.titulo;
-            } else {
-                videoDadosAtuais = {
-                    titulo: inputTituloCustomizado || "Corte do Shorts",
-                    autor: "Canal",
-                    link: youtubeUrl
-                };
+                videoDadosAtuais.titulo = inputTitulo || videoDadosAtuais.titulo;
             }
 
-            const padrao = estruturasFinanceiras[tema];
+            btn.innerText = "Analisando com IA...";
+            btn.disabled = true;
+
+            // CASO TENHA API KEY DO GEMINI SALVA (EXECUTA INTELIGÊNCIA ARTIFICIAL REAL)
+            if (apiKey) {
+                try {
+                    const prompt = `Você é um curador e roteirista especialista para um perfil de Instagram "dark" sobre dinheiro e mentalidade financeira.
+Sua tarefa é analisar a transcrição de um vídeo e o seu título, e gerar um roteiro de storytelling de alta conversão.
+
+Regra de Ouro (Frase-gancho):
+A frase de abertura (Gancho) deve ser obrigatoriamente um "setup com final em dois pontos (:)" (Setup + Cena como punchline).
+A estrutura deve ser: [Situação relacionável em 1ª ou 3ª pessoa] + ":" -> a cena do vídeo atua como o resultado/punchline.
+A fórmula deve começar com "Você é...", "Aquele(a) que...", "Quando...", "Como eu me sinto..." ou uma frase de efeito, terminando em ":".
+O texto sozinho deve ser intrigante, sem explicar diretamente o que acontece na cena.
+
+Seu retorno deve ser obrigatoriamente e estritamente em formato JSON válido, sem markdown envolta (não use blocos de código \`\`\`json), contendo exatamente as chaves abaixo:
+{
+  "abertura": "Frase setup terminando em :",
+  "fechamento": "Moral/Reflexão curta (máx 15 palavras)",
+  "legenda": "Legenda persuasiva de 1-2 parágrafos com uma CTA sutil direcionando para o produto: ${oferta}",
+  "tags": "#dinheiro #mentalidade #sucesso #perfildark"
+}
+
+Tema selecionado pelo usuário: ${tema}
+Nome do Produto na Bio: ${oferta}
+Título do Vídeo: ${videoDadosAtuais.titulo}
+Transcrição do Vídeo:
+${transcricaoAtualText || "Não disponível. Crie com base no Título do vídeo."}
+`;
+
+                    const urlGemini = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                    const res = await fetch(urlGemini, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseMimeType: "application/json" }
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const contentText = data.candidates[0].content.parts[0].text;
+                        const jsonResult = JSON.parse(contentText);
+
+                        document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo Analisado:</strong> ${videoDadosAtuais.titulo}<br>🎯 <strong>Categoria:</strong> ${tema}<br>💡 <strong>Análise:</strong> Inteligência Artificial Ativa`;
+                        document.getElementById('out-abertura').innerText = jsonResult.abertura;
+                        document.getElementById('out-fechamento').innerText = jsonResult.fechamento;
+                        document.getElementById('out-legenda').innerText = jsonResult.legenda;
+                        document.getElementById('out-tags').innerText = `${jsonResult.tags}\n\n👉 Salve esse post para manter sua mentalidade focada nas regras do jogo.`;
+
+                        salvarNoHistorico(videoDadosAtuais.titulo, tema, youtubeUrl);
+                        btn.innerText = "Gerar Roteiro (Fórmula :)";
+                        btn.disabled = false;
+                        return;
+                    }
+                } catch (err) {
+                    console.error("Falha na chamada da API Gemini:", err);
+                }
+            }
+
+            // FALLBACK LOCAL (Executado se não houver chave ou se a API falhar)
+            const padrao = estruturasFallback[tema];
             const randIdx = Math.floor(Math.random() * padrao.aberturas.length);
 
-            let abertura = `"${padrao.aberturas[randIdx]}"`;
-            let fechamento = `"${padrao.fechamentos[randIdx]}"`;
+            let abertura = padrao.aberturas[randIdx];
+            let fechamento = `"${padrao.fechamentos[0]}"`;
 
-            let legenda = `O vídeo "${videoDadosAtuais.titulo}" ilustra com clareza as dinâmicas de quem entende o fluxo do capital e como o sistema recompensa os donos do jogo.\n\nSe você deseja sair da defensiva e construir riqueza real, preparamos uma solução passo a passo.\n\n🔗 Clique no link da bio e acesse: ${oferta}.`;
-
-            if (notas) {
-                legenda = `Como extraído deste trecho: "${notas}"\n\nEssa dinâmica vista em "${videoDadosAtuais.titulo}" é o reflexo direto de quem estuda as regras do dinheiro, enquanto a maioria continua jogando de olhos fechados.\n\nPara quebrar esse ciclo e começar a estruturar ativos reais, clique no link da nossa bio e confira o: ${oferta}.`;
-            }
+            let legenda = `O vídeo "${videoDadosAtuais.titulo}" ilustra com perfeição as dinâmicas de quem entende o fluxo do capital e como o sistema recompensa os donos do jogo.\n\nSe você deseja sair da defensiva e construir riqueza real de verdade, preparamos uma solução passo a passo.\n\n🔗 Clique no link da bio e acesse: ${oferta}.`;
 
             const hashtags = `#dinheiro #independenciafinanceira #mentalidademilionaria #perfildark #negocios #financas #${tema.toLowerCase().replace(/[^a-z]/g, "")}`;
             const ganchoExtra = "👉 Salve esse post para manter sua mente focada nas regras do jogo.";
 
-            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo:</strong> ${videoDadosAtuais.titulo}<br>🎯 <strong>Abordagem:</strong> ${tema}`;
+            document.getElementById('out-fonte').innerHTML = `🎥 <strong>Vídeo:</strong> ${videoDadosAtuais.titulo}<br>🎯 <strong>Categoria:</strong> ${tema}<br>⚠️ <strong>Nota:</strong> Usando motor local (Adicione uma Chave Gemini para ler transcrições)`;
             document.getElementById('out-abertura').innerText = abertura;
             document.getElementById('out-fechamento').innerText = fechamento;
             document.getElementById('out-legenda').innerText = legenda;
             document.getElementById('out-tags').innerText = `${hashtags}\n\n${ganchoExtra}`;
 
+            salvarNoHistorico(videoDadosAtuais.titulo, tema, youtubeUrl);
+
+            btn.innerText = "Gerar Roteiro (Fórmula :)";
+            btn.disabled = false;
+        }
+
+        function salvarNoHistorico(titulo, tema, url) {
             document.getElementById('output-vazio').style.display = 'none';
             document.getElementById('output-conteudo').style.display = 'flex';
 
-            const novoRoteiro = {
-                id: Date.now(),
-                titulo: videoDadosAtuais.titulo,
-                tema: tema,
-                link: youtubeUrl
-            };
+            const novoRoteiro = { id: Date.now(), titulo, tema, link: url };
             historico.unshift(novoRoteiro);
             localStorage.setItem('historico_dark_youtube', JSON.stringify(historico));
             renderHistorico();
-            mostrarToast("Roteiro Criado com Sucesso!");
+            mostrarToast("Roteiro Criado!");
         }
 
         function renderHistorico() {
